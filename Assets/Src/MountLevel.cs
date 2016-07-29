@@ -11,14 +11,13 @@ namespace Assets.Src
         public GameObject EmptyBlock;
         public GameObject BombBlock;
         public CameraResolution Camera;
-
+        public int SizeTile = 128;
         private Level _level;
         private Dictionary<ElementTypeEnum, GameObject> _gameObjectsMap;
         private Grid _grid;
 
         private void Awake()
         {
-            _grid = new Grid(128, Camera);
             _gameObjectsMap = new Dictionary<ElementTypeEnum, GameObject>
             {
                 {ElementTypeEnum.Empty, EmptyBlock},
@@ -36,12 +35,12 @@ namespace Assets.Src
 
         private void Start()
         {
-            GameObject element;
+            _grid = gameObject.AddComponent<Grid>();
+            _grid.Setup(Camera, SizeTile);
             foreach (var elementMap in _level.Elements)
-            {
-                element = (GameObject)Instantiate(_gameObjectsMap[elementMap.ElementType]);
-                element.transform.position = _grid.GetPositionInGrid(elementMap.Col, elementMap.Row);
-            }
+                _grid.AddInGrid(_gameObjectsMap[elementMap.ElementType], elementMap.Col, elementMap.Row);
+
+            _grid.FillEmptySpaces(_gameObjectsMap[ElementTypeEnum.Empty]);
         }
 
         // Update is called once per frame

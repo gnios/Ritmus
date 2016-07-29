@@ -3,41 +3,70 @@ using UnityEngine;
 
 namespace Assets.Frameworks.Gnio2D.Grid
 {
-    public class Grid
+    public class Grid : MonoBehaviour
     {
-        private readonly float _sizeTile;
         public float AdjustX;
         public float AdjustY;
 
-        private readonly CameraResolution _camera;
+        public int SizeTile;
+        public CameraResolution Camera;
+        public GameObject[,] GridObjects = null;
 
-        public Grid(int sizeTile, CameraResolution camera)
+        private int? _collumns;
+        private int? _rows;
+
+        public void Setup(CameraResolution camera, int sizeTile)
         {
-            _sizeTile = sizeTile;
-            _camera = camera;
+            SizeTile = sizeTile;
+            Camera = camera;
+            camera.SizeTile = SizeTile;
+            GridObjects = new GameObject[Collumns.GetValueOrDefault(), Rows.GetValueOrDefault()];
         }
 
-        public Vector3 GetPositionInGrid(int col, int row)
+        public int? Collumns
         {
-            return new Vector3(CalculatePosition(col, _camera.Width) + AdjustX, CalculatePosition(row, _camera.Height) + AdjustY);
+            get { return _collumns ?? (_collumns = Mathf.RoundToInt(Camera.Width / this.SizeTile)); }
         }
 
-        private int Collumns()
+        public int? Rows
         {
-            return Mathf.RoundToInt(_camera.Width / this._sizeTile);
+            get { return _rows ?? (_rows = Mathf.RoundToInt(Camera.Height / this.SizeTile)); }
         }
 
-        private int Rows()
+        public void AddInGrid(GameObject element, int col, int row)
         {
-            return Mathf.RoundToInt(_camera.Height / this._sizeTile);
+            var instantiateGameObject = (GameObject)Instantiate(element);
+            instantiateGameObject.transform.position = GetPositionInGrid(col, row);
+            GridObjects[col, row] = instantiateGameObject;
+        }
+
+        public void FillEmptySpaces(GameObject element)
+        {
+            for (var col = 0; col < GridObjects.GetLength(0); col++)
+            {
+                for (var row = 0; row < GridObjects.GetLength(1); row++)
+                {
+                    if (GridObjects[col, row] != null)
+                        continue;
+
+                    var instantiateGameObject = (GameObject)Instantiate(element);
+                    instantiateGameObject.transform.position = GetPositionInGrid(col, row);
+                    GridObjects[col, row] = instantiateGameObject;
+                }
+            }
         }
 
         private float CalculatePosition(int interator, float cameraSize)
         {
-            var adjustRatio = (_sizeTile / 2) / _camera.UnitsPerPixel;
-            var position = cameraSize / (2 * _camera.UnitsPerPixel);
+            var adjustRatio = (SizeTile / 2) / Camera.UnitsPerPixel;
+            var position = cameraSize / (2 * Camera.UnitsPerPixel);
             position *= -1;
-            return (position + adjustRatio + (_sizeTile * interator) / _camera.UnitsPerPixel);
+            return (position + adjustRatio + (SizeTile * interator) / Camera.UnitsPerPixel);
+        }
+
+        private Vector3 GetPositionInGrid(int col, int row)
+        {
+            return new Vector3(CalculatePosition(col, Camera.Width) + AdjustX, CalculatePosition(row, Camera.Height) + AdjustY);
         }
     }
 }
