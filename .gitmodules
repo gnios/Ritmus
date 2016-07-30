@@ -1,0 +1,3 @@
+[submodule "Assets/Frameworks/GameFramework"]
+	path = Assets/Frameworks/GameFramework
+	url = https://github.com/FlipWebApps/GameFramework.git
