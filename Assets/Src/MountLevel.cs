@@ -2,6 +2,7 @@
 using Assets.Frameworks.Gnio2D.Cam;
 using Assets.Frameworks.Gnio2D.Grid;
 using Assets.Src.Models;
+using GameDevWare.Serialization;
 using UnityEngine;
 
 namespace Assets.Src
@@ -13,22 +14,23 @@ namespace Assets.Src
         public CameraResolution Camera;
         public int SizeTile = 128;
         private Level _level;
-        private Dictionary<ElementTypeEnum, GameObject> _gameObjectsMap;
+        private Dictionary<TileTypeEnum, GameObject> _gameObjectsMap;
         private Grid _grid;
 
         private void Awake()
         {
-            _gameObjectsMap = new Dictionary<ElementTypeEnum, GameObject>
+            _gameObjectsMap = new Dictionary<TileTypeEnum, GameObject>
             {
-                {ElementTypeEnum.Empty, EmptyBlock},
-                {ElementTypeEnum.Bomb, BombBlock}
+                {TileTypeEnum.Empty, EmptyBlock},
+                {TileTypeEnum.Bomb, BombBlock}
             };
             _level = new Level
             {
-                Elements = new List<ElementMap> {
-                    new ElementMap { Row = 1, Col = 1, ElementType = ElementTypeEnum.Bomb },
-                    new ElementMap { Row = 4, Col = 2, ElementType = ElementTypeEnum.Bomb },
-                    new ElementMap { Row = 3, Col = 6, ElementType = ElementTypeEnum.Bomb },
+                TileMap = new[] {
+                    new Tile { Row = 1, Col = 1, TileType = TileTypeEnum.Bomb },
+                    new Tile { Row = 4, Col = 2, TileType = TileTypeEnum.Bomb },
+                    new Tile { Row = 3, Col = 6, TileType = TileTypeEnum.Bomb },
+                    new Tile { Row = 1, Col = 6, TileType = TileTypeEnum.Bomb },
                 }
             };
         }
@@ -37,10 +39,14 @@ namespace Assets.Src
         {
             _grid = gameObject.AddComponent<Grid>();
             _grid.Setup(Camera, SizeTile);
-            foreach (var elementMap in _level.Elements)
-                _grid.AddInGrid(_gameObjectsMap[elementMap.ElementType], elementMap.Col, elementMap.Row);
+            foreach (var elementMap in _level.TileMap)
+                _grid.AddInGrid(_gameObjectsMap[elementMap.TileType], elementMap.Col, elementMap.Row);
 
-            _grid.FillEmptySpaces(_gameObjectsMap[ElementTypeEnum.Empty]);
+            _grid.FillEmptySpaces(_gameObjectsMap[TileTypeEnum.Empty]);
+            var json = Json.SerializeToString(_level, SerializationOptions.SuppressTypeInformation);
+
+            //write string to file
+            System.IO.File.WriteAllText(Application.dataPath + @"\Resources\level.txt", json);
         }
 
         // Update is called once per frame
