@@ -1,1 +1,1 @@
-{"Elements":[{"Row":1,"Col":1,"TileType":"Bomb"},{"Row":4,"Col":2,"TileType":"Bomb"},{"Row":3,"Col":6,"TileType":"Bomb"},{"Row":1,"Col":6,"TileType":"Bomb"}]}
+{"TileMap":[{"Row":1,"Col":1,"TileType":"Bomb"},{"Row":4,"Col":2,"TileType":"Bomb"},{"Row":3,"Col":6,"TileType":"Bomb"},{"Row":1,"Col":6,"TileType":"Bomb"}]}

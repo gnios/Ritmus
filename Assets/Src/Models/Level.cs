@@ -5,11 +5,11 @@ namespace Assets.Src.Models
     [Serializable]
     public class Level
     {
-        public ElementMap[] Elements { get; set; }
+        public Tile[] TileMap { get; set; }
     }
 
     [Serializable]
-    public class ElementMap
+    public class Tile
     {
         public int Row { get; set; }
 
